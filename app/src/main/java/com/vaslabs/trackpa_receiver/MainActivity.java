@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_encryption) {
-            // Handle the camera action
+
         } else if (id == R.id.nav_track_phone) {
             manageTrackPhone();
         } else {
