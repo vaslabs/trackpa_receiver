@@ -10,4 +10,5 @@
     <string name="title_phone_tracking">Phone to track</string>
     <string name="hint_phone_track">Track location sent from...</string>
     <string name="phone_prefill" />
+    <string name="scan_guide">Scan this QRcode with the phone you want to track using trackpa.</string>
 </resources>

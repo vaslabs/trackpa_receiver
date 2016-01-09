@@ -26,4 +26,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.1.0'
     compile 'com.android.support:design:22.2.1'
     compile 'com.afollestad:material-dialogs:0.7.8.1'
+    compile 'com.github.kenglxn.QRGen:android:2.1.0'
 }

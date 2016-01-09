@@ -1,5 +1,6 @@
 package com.vaslabs.trackpa_receiver;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -91,7 +92,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_encryption) {
-
+            Intent intent = new Intent(this, RSASetupActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_track_phone) {
             manageTrackPhone();
         } else {
