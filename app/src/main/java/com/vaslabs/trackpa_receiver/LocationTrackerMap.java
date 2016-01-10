@@ -4,18 +4,22 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.vaslabs.smsradar.Sms;
+import org.vaslabs.smsradar.SmsListener;
+import org.vaslabs.smsradar.SmsRadar;
+
 
 public class LocationTrackerMap implements OnMapReadyCallback, LocationListener {
 
@@ -49,9 +53,37 @@ public class LocationTrackerMap implements OnMapReadyCallback, LocationListener 
 
             myPositionMarker = mMap.addMarker(new MarkerOptions().position(latLng)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 12f));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 16f));
         }
+
+        SmsRadar.initializeSmsRadarService(context, new SmsListener() {
+            @Override
+            public void onSmsSent(Sms sms) {
+            }
+
+            @Override
+            public void onSmsReceived(Sms sms) {
+                handleSms(sms);
+            }
+        });
+
+
     }
+
+    private void handleSms(Sms sms) {
+        final String phoneNumber = sms.getAddress();
+        Toast.makeText(context, "From: " + phoneNumber, Toast.LENGTH_LONG).show();
+        final String phoneBeingTracked = PreferenceManager.getDefaultSharedPreferences(context).getString("tracking_phone", "");
+        if (phoneBeingTracked.equals(""))
+            return;
+        if (!phoneBeingTracked.equals(phoneNumber)) {
+            return;
+        }
+
+        String body = sms.getMsg();
+    }
+
+
 
     private void initLocationManager() {
         locationManager = (LocationManager)(context.getSystemService(Context.LOCATION_SERVICE));
@@ -90,5 +122,6 @@ public class LocationTrackerMap implements OnMapReadyCallback, LocationListener 
     public void onProviderDisabled(String provider) {
 
     }
+
 }
 

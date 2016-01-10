@@ -4,24 +4,28 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.text.InputType;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import org.vaslabs.smsradar.SmsRadar;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private LocationTrackerMap locationTrackerMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +54,11 @@ public class MainActivity extends AppCompatActivity
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(new LocationTrackerMap(this));
+        locationTrackerMap = new LocationTrackerMap(this);
+        mapFragment.getMapAsync(locationTrackerMap);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -83,6 +90,12 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy() {
+        SmsRadar.stopSmsRadarService(this);
+        super.onDestroy();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

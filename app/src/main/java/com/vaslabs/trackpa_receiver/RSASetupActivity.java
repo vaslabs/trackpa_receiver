@@ -58,12 +58,13 @@ public class RSASetupActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             if (exception != null) {
-                Toast.makeText(imageView.getContext(), exception.toString(), Toast.LENGTH_LONG);
+                Toast.makeText(imageView.getContext(), exception.toString(), Toast.LENGTH_LONG).show();
+                return;
             }
             Bitmap bitmap = QRCodeManager.generateQRCode(result);
             imageView.setImageBitmap(bitmap);
             Toast.makeText(imageView.getContext(), imageView.getContext().getString(R.string.scan_guide),
-                    Toast.LENGTH_LONG);
+                    Toast.LENGTH_LONG).show();
         }
     }
 }
