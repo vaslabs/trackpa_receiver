@@ -125,4 +125,12 @@ public class EncryptionManager {
         return encoded;
     }
 
+    public String decrypt(String data, Context context) throws Exception {
+        PublicKey pk = this.getPublicKey(context);
+        String base64String = Base64.encodeToString(data.getBytes(), Base64.DEFAULT);
+        base64String = base64String.replaceAll("\n", "");
+        String decryptedData = this.decrypt(Base64.decode(base64String, Base64.DEFAULT), context);
+        return decryptedData;
+    }
+
 }

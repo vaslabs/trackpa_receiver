@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.vaslabs.trackpa_receiver.encryption.EncryptionManager;
 
 import org.vaslabs.smsradar.Sms;
 import org.vaslabs.smsradar.SmsListener;
@@ -28,8 +29,8 @@ public class LocationTrackerMap implements OnMapReadyCallback, LocationListener 
     private GoogleMap mMap;
     private LocationManager locationManager;
     private Marker myPositionMarker;
-
-
+    private Marker trackedPositionMarker;
+    
     public LocationTrackerMap(Context context) {
         this.context = context;
     }
@@ -72,7 +73,6 @@ public class LocationTrackerMap implements OnMapReadyCallback, LocationListener 
 
     private void handleSms(Sms sms) {
         final String phoneNumber = sms.getAddress();
-        Toast.makeText(context, "From: " + phoneNumber, Toast.LENGTH_LONG).show();
         final String phoneBeingTracked = PreferenceManager.getDefaultSharedPreferences(context).getString("tracking_phone", "");
         if (phoneBeingTracked.equals(""))
             return;
@@ -81,8 +81,56 @@ public class LocationTrackerMap implements OnMapReadyCallback, LocationListener 
         }
 
         String body = sms.getMsg();
+
+        LatLng latLng = latLongFromMsg(body);
+        if (latLng == null)
+            return;
+
+        if (trackedPositionMarker == null)
+            initialiseTrackedPositionMarker(latLng);
+        else
+            trackedPositionMarker.setPosition(latLng);
+
     }
 
+    private void initialiseTrackedPositionMarker(LatLng latLng) {
+        trackedPositionMarker = mMap.addMarker(new MarkerOptions().position(latLng)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+    }
+
+    private LatLng latLongFromMsg(String body) {
+        if (!(body.contains("Lat:") && body.contains("Lng:")))
+        {
+            if (body.length() > 50) {
+                body = decryptBody(body);
+            }
+        }
+        if (!(body.contains("Lat:") && body.contains("Lng:")))
+        {
+            return null;
+        }
+
+        String[] parts = body.split(",");
+        String latData = parts[0];
+        String lngData = parts[1];
+
+        double latitude = entryToDouble(latData);
+        double longitude = entryToDouble(lngData);
+        return new LatLng(latitude, longitude);
+    }
+
+    private double entryToDouble(String lngData) {
+        return Double.parseDouble(lngData.split(":")[1].trim());
+    }
+
+    private String decryptBody(String body) {
+        try {
+            EncryptionManager em = new EncryptionManager();
+            return em.decrypt(body, context);
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
 
     private void initLocationManager() {
